@@ -1,0 +1,9 @@
+{
+  "type": "module",
+  "scripts": {
+    "start": "webpack serve",
+    "test": "jest --coverage"
+  },
+  "dependencies": {
+  }
+}
