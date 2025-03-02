@@ -1,6 +1,7 @@
 enum Tag {
 	DIV = 'div',
-	P = 'p'
+	P = 'p',
+	IMAGE = 'img',
 }
 
 export default Tag;

@@ -6,11 +6,10 @@ import ExperimentView from "./ExperimentView";
 import Tag from "../Tag";
 
 class AlchemyView extends Component {
-	private _listView = new ListView();
-	private _experimentView = new ExperimentView();
-
 	constructor(
 		private readonly _controller: AlchemyController,
+		private _listView = new ListView(_controller),
+		private _experimentView = new ExperimentView(_controller),
 	) {
 		super({
 			blockName: 'alchemy-container',

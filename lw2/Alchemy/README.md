@@ -33,9 +33,16 @@ classDiagram
         +onClearButtonClick()
     }
     
-    class Element {
+    class ElementTrait {
         +name: string
-        +iconSvg: string
+    }
+    
+    class ElementInstance {
+        +x: number
+        +y: number
+    }
+    
+    class Element {
         +isOpen: bool
     }
 
@@ -54,4 +61,7 @@ classDiagram
     
     AlchemyModel *-- Element
     AlchemyModel *-- CombinationRule
+    
+    Element o-- ElementTrait
+    ElementInstance o-- ElementTrait
 ```
