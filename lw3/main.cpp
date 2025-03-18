@@ -1,11 +1,17 @@
 #include <iostream>
 #include "framework.h"
 #include "../libgl/libgl.h"
+#include "TetrisView.h"
+#include "TetrisController.h"
 
 HINSTANCE hInst;                                               // current instance
 const TCHAR WINDOW_CLASS_NAME[] = TEXT("gl");                  // window class name
 const TCHAR WINDOW_TITLE[] = TEXT("Rotation");     // The title bar text
 const UINT_PTR TIMER_ID = 0;
+
+TetrisModel gameModel;
+TetrisController gameController(gameModel);
+TetrisView gameView;
 
 ATOM MyRegisterClass(HINSTANCE hInstance);
 
@@ -83,82 +89,23 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 	return TRUE;
 }
 
-void DrawTriangle()
-{
-	glBegin(GL_TRIANGLES);
-	{
-		glColor3ub(255, 0, 0);
-		glVertex3d(-0.4, -0.3, 0);
-
-		glColor3ub(0, 255, 0);
-		glVertex3d(0.4, -0.3, 0);
-
-		glColor3ub(0, 0, 255);
-		glVertex3d(0, 0.4, 0);
-	}
-	glEnd();
-}
-
 float angleX = 0;
 float angleY = 0;
 float angleZ = 0;
 
 ULONGLONG lastTick = GetTickCount64();
 
-void DrawObjects()
+void DrawScene(HWND hWnd)
 {
-	// вращаем треугольник вокруг оси X
-	{
-		glLoadIdentity();
-		glTranslatef(-0.6f, 0.6f, 0);
-		glRotatef(angleX, 1, 0, 0);
-		DrawTriangle();
-	}
+	ClearBuffers(0.1f, 0.1f, 0.1f, 1.0f);
 
-	// вращаем треугольник вокруг оси Y
-	{
-		glLoadIdentity();
-		glTranslatef(0.6f, 0.6f, 0);
-		glRotatef(angleY, 0, 1, 0);
-		DrawTriangle();
-	}
+	// Настройка проекции для игрового поля
+	glMatrixMode(GL_PROJECTION);
+	glLoadIdentity();
+	glOrtho(0, 10, 20, 0, -1, 1);
 
-	// вращаем треугольник вокруг оси Z
-	{
-		glLoadIdentity();
-		glTranslatef(0, -0.3f, 0);
-		glRotatef(angleZ, 0, 0, 1);
-		DrawTriangle();
-	}
-
-	ULONGLONG currentTick = GetTickCount64();
-	float time = (currentTick - lastTick) * 0.001f;
-	lastTick = currentTick;
-
-	angleX += 60 * time;
-	if (angleX >= 360)
-	{
-		angleX -= 360;
-	}
-
-	angleY += 30 * time;
-	if (angleY >= 360)
-	{
-		angleY -= 360;
-	}
-
-	angleZ += 70 * time;
-	if (angleZ >= 360)
-	{
-		angleZ -= 360;
-	}
-}
-
-void DrawScene()
-{
-	ClearBuffers(0, 0, 0, 0);
-
-	DrawObjects();
+	// Рендеринг игры
+	gameView.render(gameModel, GetDC(hWnd));
 
 	EndDrawing();
 }
@@ -168,7 +115,7 @@ void OnPaint(HWND hWnd)
 	PAINTSTRUCT ps;
 	BeginPaint(hWnd, &ps);
 
-	DrawScene();
+	DrawScene(hWnd);
 
 	EndPaint(hWnd, &ps);
 }

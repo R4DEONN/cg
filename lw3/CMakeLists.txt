@@ -14,6 +14,12 @@ add_executable(asteroids
         libgl/libgl.cpp
         libgl/pch.h
         libgl/pch.cpp
+        TetrisModel.cpp
+        TetrisModel.h
+        TetrisView.cpp
+        TetrisView.h
+        TetrisController.cpp
+        TetrisController.h
 )
 
 target_link_libraries(asteroids PRIVATE
