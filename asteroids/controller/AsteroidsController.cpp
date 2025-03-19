@@ -3,12 +3,11 @@
 
 void AsteroidsController::OnIdle()
 {
-	m_model.Update(GetDeltaTime());
+	m_model.Update();
 }
 
 void AsteroidsController::OnKeyboard(unsigned char key, int x, int y)
 {
-	std::cout << "Mew" << std::endl;
 	switch (key)
 	{
 	case 'A':
@@ -22,6 +21,9 @@ void AsteroidsController::OnKeyboard(unsigned char key, int x, int y)
 	case 'W':
 	case 'w':
 		m_model.GetPlayerModel().SetEngineEnabled(true);
+		return;
+	case ' ':
+		m_model.PlayerShoot();
 		return;
 	}
 }

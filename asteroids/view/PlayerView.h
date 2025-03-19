@@ -8,6 +8,6 @@ public:
 	PlayerView()
 	{}
 
-	void Render(const PlayerModel& model);
+	void Render(const PlayerModel& model, float screenWidth, float screenHeight);
 private:
 };

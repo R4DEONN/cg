@@ -10,7 +10,7 @@ classDiagram
     
     class AsteroidModel
     
-    class AsteroidView
+    class Asteroid
     
     Game *-- Player
 ```
