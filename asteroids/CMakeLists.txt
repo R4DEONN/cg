@@ -14,24 +14,19 @@ add_executable(asteroids
         View/AsteroidsView.h
         Disposable.h
         app.cpp
-        controller/AsteroidsController.cpp
         controller/AsteroidsController.h
-        model/AsteroidsModel.cpp
         model/AsteroidsModel.h
-        model/PlayerModel.cpp
         model/PlayerModel.h
-        model/AsteroidManager.cpp
         model/AsteroidManager.h
-        model/Asteroid.cpp
         model/Asteroid.h
         model/Moveable.cpp
         model/Movable.h
-        view/PlayerView.cpp
         view/PlayerView.h
-        view/AsteroidView.cpp
         view/AsteroidView.h
         model/Bullet.h
         view/BulletView.h
+        model/Constants.h
+        view/Renderer.h
 )
 
 target_link_libraries(${PROJECT_NAME} PRIVATE ${GLUT_LIBRARIES} ${OPENGL_LIBRARIES})

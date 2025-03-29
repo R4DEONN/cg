@@ -14,7 +14,7 @@ enum class ROTATE_DIRECTION
 class PlayerModel : public Movable
 {
 public:
-	PlayerModel(float width, float height) : Movable(width, height, 0, 0, 0, 0)
+	PlayerModel() : Movable(0, 0, 0, 0)
 	{
 	}
 
@@ -51,15 +51,15 @@ public:
 
 	Bullet Shoot()
 	{
-		return {m_width, m_height, m_x, m_y, m_angle};
+		return {m_x, m_y, m_angle};
 	}
 
-	float GetRadius()
+	static float GetRadius()
 	{
-		return 10.0f;
+		return 20.0f;
 	}
 
-	int GetLives()
+	[[nodiscard]] int GetLives() const
 	{
 		return m_lives;
 	}
@@ -70,13 +70,13 @@ public:
 	}
 
 private:
-	static constexpr const float ROTATE_SPEED = 180;
-	static constexpr const float ACCELERATION = 150;
-	static constexpr const float MAX_SPEED = 500;
-	static constexpr const float MIN_SPEED = 0;
+	static constexpr const double ROTATE_SPEED = 180;
+	static constexpr const double ACCELERATION = 0.5;
+	static constexpr const double MAX_SPEED = 1;
+	static constexpr const double MIN_SPEED = 0;
 
 	ROTATE_DIRECTION m_currentRotation = ROTATE_DIRECTION::NONE;
-	float m_acceleration = 0;
+	double m_acceleration = 0;
 	int m_lives = 0;
 
 	void UpdateSpeed(double elapsedTime)

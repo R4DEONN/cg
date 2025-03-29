@@ -1,18 +1,17 @@
 #pragma once
 
-
 #include "Movable.h"
 
 class Bullet : public Movable
 {
 public:
-	Bullet(float width, float height, float x, float y, float angle)
-		: Movable(width, height, x, y, 300, angle)
+	Bullet(double x, double y, double angle)
+		: Movable(x, y, 1, angle)
 	{
 	}
 
-	float GetRadius() const
+	static double GetRadius()
 	{
-		return 2;
+		return 5;
 	}
 };

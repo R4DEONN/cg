@@ -18,28 +18,20 @@ enum class SPAWN_BORDER
 class AsteroidManager
 {
 public:
-	AsteroidManager(float width, float height)
-		: m_width(width),
-		  m_height(height)
-	{
-	}
+	AsteroidManager() = default;
 
 	void CreateAsteroid()
 	{
 		SPAWN_BORDER border = GetRandomBorder(m_randomEngine);
 
-		// Генерация координат на выбранной границе
 		auto [x, y] = GetSpawnPosition(border);
 
-		// Генерация случайной скорости (от 300 до 500)
-		std::uniform_real_distribution<float> speedDist(300, 500);
+		std::uniform_real_distribution<float> speedDist(0.25, .5);
 		float speed = speedDist(m_randomEngine);
 
-		// Генерация угла движения, направленного внутрь экрана
 		float angle = GetSpawnAngle(border, m_randomEngine);
 
-		// Создание астероида
-		auto newAsteroid = Asteroid(m_width, m_height, x, y, speed, angle, ASTEROID_TYPE::BIG);
+		auto newAsteroid = Asteroid(x, y, speed, angle, ASTEROID_TYPE::BIG);
 		m_asteroids.push_back(newAsteroid);
 	}
 
@@ -51,24 +43,19 @@ public:
 
 		m_timeSinceLastCreation += elapsedTime;
 
-		// Если прошла секунда, создаём новый астероид
-		if (m_timeSinceLastCreation >= 1.0) // 1.0 секунда
+		if (m_timeSinceLastCreation >= 1.5)
 		{
-			CreateAsteroid(); // Создаём новый астероид
-			m_timeSinceLastCreation = 0; // Обновляем время последнего создания
+			CreateAsteroid();
+			m_timeSinceLastCreation = 0;
 		}
 	}
 
-	void SetBoundingRect(float width, float height)
+	[[nodiscard]] const std::vector<Asteroid>& GetImmutableAsteroids() const
 	{
-		m_width = width;
-		m_height = height;
-		std::for_each(m_asteroids.begin(), m_asteroids.end(), [this] (auto& asteroid) {
-			asteroid.SetBoundingRect(m_width, m_height);
-		});
+		return m_asteroids;
 	}
 
-	[[nodiscard]] std::vector<Asteroid>& GetAsteroidsData()
+	[[nodiscard]] std::vector<Asteroid>& GetAsteroids()
 	{
 		return m_asteroids;
 	}
@@ -80,53 +67,51 @@ public:
 
 private:
 	std::vector<Asteroid> m_asteroids;
-	float m_width = 640;
-	float m_height = 480;
 
-	float m_timeSinceLastCreation;
+	double m_timeSinceLastCreation{};
 	std::default_random_engine m_randomEngine;
 
-	SPAWN_BORDER GetRandomBorder(std::default_random_engine& randomEngine)
+	static SPAWN_BORDER GetRandomBorder(std::default_random_engine& randomEngine)
 	{
-		std::uniform_int_distribution<int> borderDist(0, 3); // 0: TOP, 1: BOTTOM, 2: LEFT, 3: RIGHT
+		std::uniform_int_distribution<int> borderDist(0, 3);
 		return static_cast<SPAWN_BORDER>(borderDist(randomEngine));
 	}
 
 	std::pair<float, float> GetSpawnPosition(SPAWN_BORDER border)
 	{
-		std::uniform_real_distribution<float> posDist(0, 1); // Для случайной позиции на границе
+		std::uniform_real_distribution<float> posDist(-1, 1);
 
 		switch (border)
 		{
 		case SPAWN_BORDER::TOP:
-			return { posDist(m_randomEngine) * m_width, -m_height / 2 }; // Верхняя граница
+			return { posDist(m_randomEngine), -1 };
 		case SPAWN_BORDER::BOTTOM:
-			return { posDist(m_randomEngine) * m_width, m_height / 2 }; // Нижняя граница
+			return { posDist(m_randomEngine), 1 };
 		case SPAWN_BORDER::LEFT:
-			return { -m_width / 2, posDist(m_randomEngine) * m_height }; // Левая граница
+			return { -1, posDist(m_randomEngine) };
 		case SPAWN_BORDER::RIGHT:
-			return { m_width / 2, posDist(m_randomEngine) * m_height }; // Правая граница
+			return { 1, posDist(m_randomEngine) };
 		default:
-			return { 0, 0 }; // По умолчанию (не должно происходить)
+			return { 0, 0 };
 		}
 	}
 
 	float GetSpawnAngle(SPAWN_BORDER border, std::default_random_engine& randomEngine)
 	{
-		std::uniform_real_distribution<float> angleDist(0, 90); // Угол отклонения от направления внутрь экрана
+		std::uniform_real_distribution<float> angleDist(0, 90);
 
 		switch (border)
 		{
 		case SPAWN_BORDER::TOP:
-			return 90 + angleDist(randomEngine); // Движение вниз с небольшим отклонением
+			return 90 + angleDist(randomEngine);
 		case SPAWN_BORDER::BOTTOM:
-			return 270 + angleDist(randomEngine); // Движение вверх с небольшим отклонением
+			return 270 + angleDist(randomEngine);
 		case SPAWN_BORDER::LEFT:
-			return 0 + angleDist(randomEngine); // Движение вправо с небольшим отклонением
+			return 0 + angleDist(randomEngine);
 		case SPAWN_BORDER::RIGHT:
-			return 180 + angleDist(randomEngine); // Движение влево с небольшим отклонением
+			return 180 + angleDist(randomEngine);
 		default:
-			return 0; // По умолчанию (не должно происходить)
+			return 0;
 		}
 	}
 };

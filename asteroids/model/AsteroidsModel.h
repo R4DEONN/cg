@@ -6,27 +6,24 @@
 #include "AsteroidManager.h"
 #include "windows.h"
 #include "Bullet.h"
+#include "Constants.h"
 
 class AsteroidsModel
 {
 public:
-	AsteroidsModel(float width, float height)
-	: m_player(width, height),
-		m_asteroidManager(width, height)
-	{
+	AsteroidsModel() = default;
 
-	}
-
-	void SetBoundingRect(float width, float height)
+	void Update()
 	{
-		m_player.SetBoundingRect(width, height);
-		m_asteroidManager.SetBoundingRect(width, height);
-		std::for_each(m_bullets.begin(), m_bullets.end(), [width, height] (Bullet& bullet) {
-			bullet.SetBoundingRect(width, height);
+		auto elapsedTime = GetDeltaTime();
+		m_player.Update(elapsedTime);
+		m_asteroidManager.Update(elapsedTime);
+		std::for_each(m_bullets.begin(), m_bullets.end(), [elapsedTime] (Bullet& bullet) {
+			bullet.Update(elapsedTime);
 		});
+		CheckCollisions();
+		CheckBulletAsteroidCollisions();
 	}
-
-	void Update();
 
 	[[nodiscard]] const PlayerModel& GetImmutablePlayerModel() const
 	{
@@ -43,9 +40,44 @@ public:
 		m_bullets.push_back(m_player.Shoot());
 	}
 
+	[[nodiscard]] const std::vector<Asteroid>& GetAsteroids() const
+	{
+		return m_asteroidManager.GetImmutableAsteroids();
+	}
+
+	[[nodiscard]] const std::vector<Bullet>& GetBullets() const
+	{
+		return m_bullets;
+	}
+
+	void SetBoundingRect(float width, float height)
+	{
+		m_width = width;
+		m_height = height;
+	}
+
+
+private:
+	PlayerModel m_player;
+	AsteroidManager m_asteroidManager;
+	std::vector<Bullet> m_bullets;
+	//TODO: В using Вынести
+	//TODO: Сделать так, чтобы пули не улетали и сделать ограничение на макс количество
+	std::chrono::steady_clock::time_point m_lastFrameTime;
+	double m_width = WIDTH;
+	double m_height = HEIGHT;
+
+	float GetDeltaTime()
+	{
+		auto currentTime = std::chrono::steady_clock::now();
+		auto deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
+		m_lastFrameTime = currentTime;
+		return deltaTime;
+	}
+
 	void CheckCollisions()
 	{
-		for (const auto& asteroid : m_asteroidManager.GetAsteroidsData())
+		for (const auto& asteroid : m_asteroidManager.GetImmutableAsteroids())
 		{
 			if (CheckCollision(asteroid))
 			{
@@ -54,7 +86,7 @@ public:
 			}
 		}
 	}
-	
+
 	void OnPlayerDeath()
 	{
 		m_asteroidManager.Clear();
@@ -84,48 +116,36 @@ public:
 
 	bool CheckCollision(const Asteroid& asteroid)
 	{
-		float dx = m_player.GetX() - asteroid.GetX();
-		float dy = m_player.GetY() - asteroid.GetY();
-		float distance = std::sqrt(dx * dx + dy * dy);
+		double playerX = m_player.GetX() * m_width;
+		double playerY = m_player.GetY() * m_height;
+		double asteroidX = asteroid.GetX() * m_width;
+		double asteroidY = asteroid.GetY() * m_height;
 
-		float radiusSum = m_player.GetRadius() + asteroid.GetRadius();
+		double playerRadius = PlayerModel::GetRadius();
+		double asteroidRadius = asteroid.GetRadius();
 
-		return distance < radiusSum;
+		double dx = playerX - asteroidX;
+		double dy = playerY - asteroidY;
+		double distance = std::sqrt(dx * dx + dy * dy);
+
+		return distance < (playerRadius + asteroidRadius);
 	}
 
-	[[nodiscard]] std::vector<Asteroid>& GetAsteroids()
+	[[nodiscard]] bool CheckBulletAsteroidCollision(const Bullet& bullet, const Asteroid& asteroid) const
 	{
-		return m_asteroidManager.GetAsteroidsData();
-	}
+		double bulletX = bullet.GetX() * m_width;
+		double bulletY = bullet.GetY() * m_height;
+		double asteroidX = asteroid.GetX() * m_width;
+		double asteroidY = asteroid.GetY() * m_height;
 
-	const std::vector<Bullet>& GetBullets() const
-	{
-		return m_bullets;
-	}
+		double bulletRadius = Bullet::GetRadius();
+		double asteroidRadius = asteroid.GetRadius();
 
-private:
-	PlayerModel m_player;
-	AsteroidManager m_asteroidManager;
-	std::vector<Bullet> m_bullets;
-	std::chrono::steady_clock::time_point m_lastFrameTime;
+		double dx = bulletX - asteroidX;
+		double dy = bulletY - asteroidY;
+		double distance = std::sqrt(dx * dx + dy * dy);
 
-	float GetDeltaTime()
-	{
-		auto currentTime = std::chrono::steady_clock::now();
-		auto deltaTime = std::chrono::duration<float>(currentTime - m_lastFrameTime).count();
-		m_lastFrameTime = currentTime;
-		return deltaTime;
-	}
-
-	bool CheckBulletAsteroidCollision(const Bullet& bullet, const Asteroid& asteroid)
-	{
-		float dx = bullet.GetX() - asteroid.GetX();
-		float dy = bullet.GetY() - asteroid.GetY();
-		float distance = std::sqrt(dx * dx + dy * dy);
-
-		float radiusSum = bullet.GetRadius() + asteroid.GetRadius();
-
-		return distance < radiusSum;
+		return distance < (bulletRadius + asteroidRadius);
 	}
 
 	void CheckBulletAsteroidCollisions()
@@ -135,13 +155,13 @@ private:
 		{
 			bool bulletDestroyed = false;
 
-			auto asteroidIt = m_asteroidManager.GetAsteroidsData().begin();
-			while (asteroidIt != m_asteroidManager.GetAsteroidsData().end())
+			auto asteroidIt = m_asteroidManager.GetAsteroids().begin();
+			while (asteroidIt != m_asteroidManager.GetAsteroids().end())
 			{
 				if (CheckBulletAsteroidCollision(*bulletIt, *asteroidIt))
 				{
-					asteroidIt = m_asteroidManager.GetAsteroidsData().erase(asteroidIt);
-					bulletIt = m_bullets.erase(bulletIt);
+					asteroidIt = m_asteroidManager.GetAsteroids().erase(asteroidIt);
+					bulletIt = m_bullets.erase(bulletIt); //TODO: сделать через два итератора
 					bulletDestroyed = true;
 					break;
 				}

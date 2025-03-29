@@ -12,17 +12,12 @@ enum class ASTEROID_TYPE
 class Asteroid : public Movable
 {
 public:
-	Asteroid(float width, float height, float x, float y, float speed, float angle, ASTEROID_TYPE asteroidType)
-	: Movable(width, height, x, y, speed, angle), m_asteroidType(asteroidType)
+	Asteroid(float x, float y, float speed, float angle, ASTEROID_TYPE asteroidType)
+	: Movable(x, y, speed, angle), m_asteroidType(asteroidType)
 	{
 	}
 
-	ASTEROID_TYPE GetAsteroidType()
-	{
-		return m_asteroidType;
-	}
-
-	float GetRadius() const
+	[[nodiscard]] float GetRadius() const
 	{
 		switch (m_asteroidType)
 		{

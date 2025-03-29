@@ -2,13 +2,11 @@
 #include "Movable.h"
 #include "cmath"
 
-Movable::Movable(float width, float height, float x, float y, float speed, float angle)
+Movable::Movable(double x, double y, double speed, double angle)
 	: m_x(x),
 	  m_y(y),
 	  m_angle(angle),
-	  m_speed(speed),
-	  m_width(width),
-	  m_height(height)
+	  m_speed(speed)
 {
 }
 
@@ -20,43 +18,43 @@ void Movable::Update(double elapsedTime)
 	CheckBounds();
 }
 
-float Movable::GetSpeed() const
+double Movable::GetSpeed() const
 {
 	return m_speed;
 }
 
-float Movable::GetAngle() const
+double Movable::GetAngle() const
 {
 	return m_angle;
 }
 
-float Movable::GetY() const
+double Movable::GetY() const
 {
 	return m_y;
 }
 
-float Movable::GetX() const
+double Movable::GetX() const
 {
 	return m_x;
 }
 
 void Movable::CheckBounds()
 {
-	if (m_x > m_width / 2)
+	if (m_x > 1)
 	{
-		m_x -= m_width;
+		m_x -= 2;
 	}
-	else if (m_x < -m_width / 2)
+	else if (m_x < -1)
 	{
-		m_x += m_width;
+		m_x += 2;
 	}
 
-	if (m_y > m_height / 2)
+	if (m_y > 1)
 	{
-		m_y -= m_height;
+		m_y -= 2;
 	}
-	else if (m_y < -m_height / 2)
+	else if (m_y < -1)
 	{
-		m_y += m_height;
+		m_y += 2;
 	}
 }

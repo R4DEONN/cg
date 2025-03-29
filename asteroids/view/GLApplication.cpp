@@ -38,6 +38,7 @@ CGLApplication::CGLApplication(
 
 	// Задаем обработчики событий
 	InitEventHandlers();
+	glutFullScreen();
 }
 
 void CGLApplication::InitEventHandlers()

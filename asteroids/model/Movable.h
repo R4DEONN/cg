@@ -5,36 +5,28 @@
 class Movable
 {
 public:
-	Movable(float width, float height, float x, float y, float speed, float angle);
+	Movable(double x, double y, double speed, double angle);
 
 	virtual void Update(double elapsedTime);
-
-	void SetBoundingRect(float width, float height)
-	{
-		m_width = width;
-		m_height = height;
-	}
 
 	virtual void BeforeUpdate(double elapsedTime)
 	{}
 
-	[[nodiscard]] float GetX() const;
+	[[nodiscard]] double GetX() const;
 
-	[[nodiscard]] float GetY() const;
+	[[nodiscard]] double GetY() const;
 
-	[[nodiscard]] float GetSpeed() const;
+	//TODO: не используется
+	[[nodiscard]] double GetSpeed() const;
 
-	[[nodiscard]] float GetAngle() const;
+	[[nodiscard]] double GetAngle() const;
 
 private:
 	void CheckBounds();
 
 protected:
-	float m_x = 0;
-	float m_y = 0;
-	float m_speed = 0;
-	float m_angle;
-
-	float m_width = 640;
-	float m_height = 480;
+	double m_x = 0;
+	double m_y = 0;
+	double m_speed = 0;
+	double m_angle;
 };

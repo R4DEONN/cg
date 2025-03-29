@@ -6,10 +6,10 @@
 class AsteroidView
 {
 public:
-	void Render(const Asteroid& model, float screenWidth, float screenHeight)
+	static void Render(const Asteroid& model, float screenWidth, float screenHeight)
 	{
-		const auto x = model.GetX();
-		const auto y = model.GetY();
+		const auto x = model.GetX() * screenWidth / 2;
+		const auto y = model.GetY() * screenHeight / 2;
 		const auto angle = model.GetAngle();
 		const float radius = model.GetRadius();
 
@@ -19,8 +19,7 @@ public:
 			glTranslatef(offsetX, offsetY, 0);
 			glRotatef(angle, 0, 0, 1); // Вращение вокруг оси Z
 
-			// Отрисовка астероида как восьмиугольника
-			glColor3f(0.5f, 0.5f, 0.5f); // Серый цвет
+			glColor3f(0.5f, 0.5f, 0.5f);
 			glBegin(GL_POLYGON);
 			for (int i = 0; i < 8; ++i)
 			{
