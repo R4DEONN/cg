@@ -6,6 +6,7 @@
 #include <iostream>
 #include "MazeController.h"
 #include "stb_image.h"
+#include "Enemy.h"
 
 GLuint LoadTexture(const char* filename)
 {
@@ -37,7 +38,7 @@ class MazeView
 {
 public:
 	MazeView(int width, int height)
-		: m_windowWidth(width), m_windowHeight(height), m_window(nullptr)
+		: m_windowWidth(width), m_windowHeight(height), m_window(nullptr), m_enemy(0, 0, 10)
 	{
 	}
 
@@ -79,6 +80,7 @@ public:
 		UpdateProjection(m_windowWidth, m_windowHeight);
 
 		wallTexture = LoadTexture("wall_texture.png");
+		m_enemyTexture = LoadTexture("malov.png");
 
 		while (!glfwWindowShouldClose(m_window))
 		{
@@ -96,7 +98,9 @@ private:
 	int m_windowHeight;
 	GLFWwindow* m_window;
 	MazeController m_controller;
-	GLuint wallTexture;
+	GLuint wallTexture{};
+	Enemy m_enemy;
+	GLuint m_enemyTexture{};
 
 	void InitOpenGL()
 	{
@@ -140,6 +144,13 @@ private:
 
 	void Update()
 	{
+		static float lastTime = glfwGetTime();
+		float currentTime = glfwGetTime();
+		float deltaTime = currentTime - lastTime;
+		lastTime = currentTime;
+
+		m_enemy.Update(m_controller.GetModel(), deltaTime);
+
 		m_controller.HandleInput(m_window);
 		UpdateView();
 	}
@@ -158,7 +169,38 @@ private:
 		glLightfv(GL_LIGHT0, GL_POSITION, lightPos);
 
 		DrawMaze();
+		DrawEnemy();
 	}
+
+	void DrawEnemy()
+	{
+		InitMaterialLightness();
+		glEnable(GL_TEXTURE_2D);
+		glBindTexture(GL_TEXTURE_2D, m_enemyTexture);
+
+		float x = m_enemy.GetX();
+		float y = m_enemy.GetY();
+		float z = m_enemy.GetZ();
+		float size = MazeModel::CELL_SIZE * 0.8f;
+		float rotation = m_enemy.GetRotation();
+
+		glPushMatrix();
+		glTranslatef(x, y, z);
+		glRotatef(rotation, 0.0f, 1.0f, 0.0f);
+
+		glBegin(GL_QUADS);
+		glNormal3f(0.0f, 0.0f, 1.0f);
+		glTexCoord2f(0.0f, 1.0f); glVertex3f(-size/2, -size/2, 0);
+		glTexCoord2f(1.0f, 1.0f); glVertex3f(size/2, -size/2, 0);
+		glTexCoord2f(1.0f, 0.0f); glVertex3f(size/2, size/2, 0);
+		glTexCoord2f(0.0f, 0.0f); glVertex3f(-size/2, size/2, 0);
+
+		glEnd();
+
+		glPopMatrix();
+		glDisable(GL_TEXTURE_2D);
+	}
+
 
 	void DrawMaze()
 	{
@@ -245,6 +287,12 @@ private:
 	{
 		GLfloat ceilingColor[] = {0.0f, 0.0f, 1.0f, 1.0f};
 		glMaterialfv(GL_FRONT, GL_DIFFUSE, ceilingColor);
+		GLfloat matAmbient[] = {0.3f, 0.3f, 0.3f, 1.0f};
+		GLfloat matSpecular[] = {0.5f, 0.5f, 0.5f, 1.0f};
+		GLfloat matShininess[] = {32.0f};
+		glMaterialfv(GL_FRONT, GL_AMBIENT, matAmbient);
+		glMaterialfv(GL_FRONT, GL_SPECULAR, matSpecular);
+		glMaterialfv(GL_FRONT, GL_SHININESS, matShininess);
 
 		glBegin(GL_QUADS);
 		glNormal3f(0.0f, -1.0f, 0.0f);

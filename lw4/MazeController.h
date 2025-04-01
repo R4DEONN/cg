@@ -8,8 +8,8 @@ class MazeController
 public:
 	void HandleInput(GLFWwindow* window)
 	{
-		const float moveSpeed = 0.08f;
-		const float rotateSpeed = 0.15f;
+		const float moveSpeed = 0.05f;
+		const float rotateSpeed = 0.2f;
 
 		if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 		{

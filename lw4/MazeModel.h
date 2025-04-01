@@ -7,7 +7,7 @@ class MazeModel
 {
 public:
 	static constexpr float CELL_SIZE = 5.0f;
-	static constexpr float PLAYER_RADIUS = 0.2f;
+	static constexpr float PLAYER_RADIUS = 0.3f;
 
 	[[nodiscard]] auto GetMaze() const
 	{
@@ -65,6 +65,19 @@ public:
 		NormalizeAngle();
 	}
 
+	[[nodiscard]] bool IsWall(float x, float z) const
+	{
+		int gridX = static_cast<int>(std::floor(x / CELL_SIZE));
+		int gridZ = static_cast<int>(std::floor(z / CELL_SIZE));
+
+		if (gridX < 0 || gridX >= m_mazeSize || gridZ < 0 || gridZ >= m_mazeSize)
+		{
+			return false;
+		}
+
+		return m_maze[gridX][gridZ] == 1;
+	}
+
 private:
 	static const int m_mazeSize = 16;
 	int m_maze[m_mazeSize][m_mazeSize] = {
@@ -103,47 +116,7 @@ private:
 		}
 	}
 
-	bool IsWall(float x, float z)
-	{
-		int gridX = static_cast<int>(std::floor(x / CELL_SIZE));
-		int gridZ = static_cast<int>(std::floor(z / CELL_SIZE));
-
-		if (gridX < 0 || gridX >= m_mazeSize || gridZ < 0 || gridZ >= m_mazeSize)
-		{
-			return false;
-		}
-
-		return m_maze[gridX][gridZ] == 1;
-	}
-
-
-	bool IsColliding(float newX, float newZ)
-	{
-		int gridX = static_cast<int>(newX / CELL_SIZE);
-		int gridZ = static_cast<int>(newZ / CELL_SIZE);
-
-		if (gridX < 0 || gridX >= m_mazeSize || gridZ < 0 || gridZ >= m_mazeSize)
-		{
-			return false;
-		}
-
-		if (m_maze[gridX][gridZ] == 1)
-		{
-			return true;
-		}
-
-		if (m_maze[static_cast<int>((newX - PLAYER_RADIUS) / CELL_SIZE)][gridZ] == 1 ||
-			m_maze[static_cast<int>((newX + PLAYER_RADIUS) / CELL_SIZE)][gridZ] == 1 ||
-			m_maze[gridX][static_cast<int>((newZ - PLAYER_RADIUS) / CELL_SIZE)] == 1 ||
-			m_maze[gridX][static_cast<int>((newZ + PLAYER_RADIUS) / CELL_SIZE)] == 1)
-		{
-			return true;
-		}
-
-		return false;
-	}
-
-	void NormalizeAngle()
+		void NormalizeAngle()
 	{
 		m_angleY = std::fmod(m_angleY, 360.0f);
 		if (m_angleY < 0.0f)

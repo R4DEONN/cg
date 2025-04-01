@@ -12,16 +12,22 @@ pkg_check_modules(GLFW REQUIRED glfw3)
 # Для поиска OpenGL
 find_package(OpenGL REQUIRED)
 
+find_package(SFML COMPONENTS audio REQUIRED)
+
 add_executable(Maze3D main.cpp
         MazeModel.h
         MazeController.h
         MazeView.h
-        stb_image.h)
+        stb_image.h
+        Enemy.h
+        EnemySound.h)
 
 # Добавляем include-директории GLFW и OpenGL
 target_include_directories(Maze3D PRIVATE
         ${GLFW_INCLUDE_DIRS}
         ${OPENGL_INCLUDE_DIR}
+        ${SFML_INCLUDE_DIR}
+        sfml-audio
 )
 
 target_link_libraries(Maze3D PRIVATE
@@ -33,6 +39,7 @@ target_link_libraries(Maze3D PRIVATE
         user32
         shell32
         dwmapi
+        sfml-audio
 )
 
 if(MINGW)
