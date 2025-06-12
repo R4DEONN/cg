@@ -67,8 +67,10 @@ public:
 
 	[[nodiscard]] bool IsWall(float x, float z) const
 	{
-		int gridX = static_cast<int>(std::floor(x / CELL_SIZE));
-		int gridZ = static_cast<int>(std::floor(z / CELL_SIZE));
+		x = std::floor((x) / CELL_SIZE);
+		z = std::floor(z / CELL_SIZE);
+		int gridX = static_cast<int>(x);
+		int gridZ = static_cast<int>(z);
 
 		if (gridX < 0 || gridX >= m_mazeSize || gridZ < 0 || gridZ >= m_mazeSize)
 		{
@@ -110,13 +112,13 @@ private:
 		{
 			dx = 0;
 		}
-		if (IsWall(m_camX, newZ + PLAYER_RADIUS +dz) ||IsWall(m_camX, newZ - PLAYER_RADIUS + dz     ))
+		if (IsWall(m_camX, newZ + PLAYER_RADIUS + dz) || IsWall(m_camX, newZ - PLAYER_RADIUS + dz))
 		{
 			dz = 0;
 		}
 	}
 
-		void NormalizeAngle()
+	void NormalizeAngle()
 	{
 		m_angleY = std::fmod(m_angleY, 360.0f);
 		if (m_angleY < 0.0f)

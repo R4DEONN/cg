@@ -121,7 +121,6 @@ private:
 		glLightfv(GL_LIGHT0, GL_SPECULAR, specularLight);
 		//TODO: Как задать точечный и направленный источник света
 
-		glTexEnvi(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
 	}
 
 	static void UpdateProjection(int width, int height)
@@ -199,6 +198,7 @@ private:
 
 		glPopMatrix();
 		glDisable(GL_TEXTURE_2D);
+		//Windows Media Foundation
 	}
 
 
